@@ -1,5 +1,5 @@
 // api/login.js
-const { supabase, ok, err, buatSesi, parseBody } = require('../lib/supabase');
+const { supabase, ok, err, buatToken, parseBody } = require('../lib/supabase');
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') return err(res, 'Method tidak valid.', 405);
@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
     if (!user) return err(res, 'ID atau kata sandi salah.');
     if (user.sandi !== sandi) return err(res, 'ID atau kata sandi salah.');
 
-    const token = buatSesi({ id: user.id, peran: peran === 'kepsek' ? 'kepsek' : peran, nama: user.nama });
+    const token = buatToken({ id: user.id, peran: peran === 'kepsek' ? 'kepsek' : peran, nama: user.nama });
 
     const info = { id: user.id, nama: user.nama, peran: peran === 'kepsek' ? 'kepsek' : peran, foto: user.foto || null };
     if (peran === 'siswa')  info.kelas = user.kelas;
