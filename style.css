@@ -1,0 +1,1493 @@
+/* ============================================================
+   E-Learning SDN 74 Krui — style.css
+   Sesuai desain skripsi "Perancangan UI/UX Sistem Informasi
+   E-Learning Berbasis Website di SD Negeri 74 Krui"
+   Oleh: Agung Stiawan (NPM: 2171020044)
+   UIN Raden Intan Lampung, 2026
+   ============================================================ */
+
+/* ============================================================
+   1. VARIABEL & RESET
+   ============================================================ */
+:root {
+    /* Warna utama — biru sebagai identitas sistem pendidikan */
+    --primary:        #0d6efd;
+    --primary-dark:   #0a58ca;
+    --primary-light:  #e8f0fe;
+    --primary-ultra:  #f0f4ff;
+
+    /* Warna Kahoot (terintegrasi sesuai Gambar 4.5 skripsi) */
+    --kahoot:         #46178f;
+    --kahoot-dark:    #33106a;
+
+    /* Warna latar & elemen */
+    --bg-page:        #f4f7fe;
+    --bg-card:        #ffffff;
+    --border-color:   #e2e8f0;
+    --text-primary:   #1a1a2e;
+    --text-secondary: #6c757d;
+    --text-muted:     #adb5bd;
+
+    /* Status */
+    --success:        #2ecc71;
+    --success-bg:     #d1f2eb;
+    --warning:        #f39c12;
+    --warning-bg:     #fef9e7;
+    --danger:         #dc3545;
+    --danger-bg:      #fff5f5;
+    --info:           #3498db;
+    --info-bg:        #e8f4fd;
+
+    /* Layout */
+    --sidebar-w:      255px;
+    --navbar-h:       66px;
+    --radius-sm:      8px;
+    --radius-md:      12px;
+    --radius-lg:      16px;
+    --radius-xl:      20px;
+    --radius-full:    9999px;
+
+    /* Bayangan */
+    --shadow-sm:      0 1px 4px rgba(0,0,0,.06);
+    --shadow-md:      0 2px 14px rgba(0,0,0,.08);
+    --shadow-lg:      0 8px 32px rgba(0,0,0,.12);
+
+    /* Transisi */
+    --ease:           0.22s ease;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg-page);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   2. LOADING OVERLAY — Bintang Belajar (Ceria · Memotivasi)
+   Skripsi BAB IV: Animasi loading ramah anak, tema edukatif.
+   Kecepatan: 0.5x (lambat-tenang, nyaman untuk anak SD).
+   Implementasi: Lottie Player (primary) + CSS-only fallback.
+   ============================================================ */
+
+/* ── Overlay penuh (login / logout) ── */
+#loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    animation: overlayIn 0.25s ease forwards;
+}
+#loading-overlay.d-none { display: none !important; }
+
+@keyframes overlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.loading-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+}
+
+.lottie-wrap {
+    width: 180px;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Warna bintang (overlay & nav-loading) ── */
+.star-poly--main { fill: #EF9F27; }
+.star-poly--1    { fill: #7F77DD; }
+.star-poly--2    { fill: #D85A30; }
+.star-poly--3    { fill: #1D9E75; }
+.star-poly--4    { fill: #D4537E; }
+
+/* ── CSS Fallback: Panggung Bintang ── */
+.star-stage {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 8px;
+    display: none;
+}
+.star-stage.aktif { display: block; }
+
+/* Semua durasi dikali 2 (= 0.5x kecepatan) */
+.star-main {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: starPulse 3.6s ease-in-out infinite,
+               starSpin  8.0s linear infinite;
+    filter: drop-shadow(0 0 10px rgba(239,159,39,0.5));
+}
+@keyframes starPulse {
+    0%,100% { transform: translate(-50%,-50%) scale(1);    }
+    50%     { transform: translate(-50%,-50%) scale(1.18); }
+}
+@keyframes starSpin {
+    to { transform: translate(-50%,-50%) rotate(360deg); }
+}
+
+.star-orb { position: absolute; }
+.star-orb--1 { top:10px; left:12px;
+    animation: orb1 4.8s ease-in-out infinite, orbSpin 6.4s linear infinite; }
+.star-orb--2 { top:8px; right:10px;
+    animation: orb2 5.6s ease-in-out infinite, orbSpin 5.2s linear infinite reverse; }
+.star-orb--3 { bottom:12px; right:16px;
+    animation: orb3 4.0s ease-in-out infinite, orbSpin 7.6s linear infinite; }
+.star-orb--4 { bottom:10px; left:14px;
+    animation: orb4 6.4s ease-in-out infinite, orbSpin 4.8s linear infinite reverse; }
+
+@keyframes orb1 {
+    0%,100% { transform:translate(0,0) scale(1); }
+    25%     { transform:translate(6px,-6px) scale(1.15); }
+    75%     { transform:translate(-4px,5px) scale(0.9); }
+}
+@keyframes orb2 {
+    0%,100% { transform:translate(0,0) scale(1); }
+    25%     { transform:translate(-7px,-4px) scale(1.12); }
+    75%     { transform:translate(5px,4px) scale(0.88); }
+}
+@keyframes orb3 {
+    0%,100% { transform:translate(0,0) scale(1); }
+    33%     { transform:translate(5px,7px) scale(1.15); }
+    66%     { transform:translate(-4px,-4px) scale(0.9); }
+}
+@keyframes orb4 {
+    0%,100% { transform:translate(0,0) scale(1); }
+    25%     { transform:translate(-4px,6px) scale(1.1); }
+    75%     { transform:translate(4px,-5px) scale(1.08); }
+}
+@keyframes orbSpin { to { transform:rotate(360deg); } }
+
+/* Kilap — kecepatan 0.5x */
+.twinkle {
+    position: absolute;
+    border-radius: 50%;
+}
+.tw-1 { width:8px;  height:8px;  background:#EF9F27; top:2px;    left:60px;  animation:twinklePop 3.6s ease-in-out infinite 0s;    }
+.tw-2 { width:6px;  height:6px;  background:#7F77DD; top:28px;   right:2px;  animation:twinklePop 4.4s ease-in-out infinite 1.0s;  }
+.tw-3 { width:7px;  height:7px;  background:#D85A30; bottom:6px; left:38px;  animation:twinklePop 3.2s ease-in-out infinite 1.8s;  }
+.tw-4 { width:5px;  height:5px;  background:#1D9E75; bottom:18px;right:6px;  animation:twinklePop 4.8s ease-in-out infinite 0.6s;  }
+.tw-5 { width:6px;  height:6px;  background:#D4537E; top:48%;    left:2px;   animation:twinklePop 4.0s ease-in-out infinite 2.2s;  }
+@keyframes twinklePop {
+    0%,100% { transform:scale(0);   opacity:0;   }
+    40%     { transform:scale(1.3); opacity:1;   }
+    70%     { transform:scale(0.8); opacity:0.5; }
+}
+
+/* ── Teks Loading ramah anak ── */
+.loading-text {
+    margin-top: 4px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 3.2rem;
+    letter-spacing: 0.01em;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* ── Titik loader tiga warna — kecepatan 0.5x (2.2s) ── */
+.loading-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 14px;
+}
+.ld {
+    display: inline-block;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    animation: ldBounce 2.2s ease-in-out infinite;
+}
+.ld--1 { background:#EF9F27; animation-delay:0s;    }
+.ld--2 { background:#7F77DD; animation-delay:0.36s; }
+.ld--3 { background:#D4537E; animation-delay:0.72s; }
+@keyframes ldBounce {
+    0%,80%,100% { transform:scale(0.55); opacity:0.4; }
+    40%          { transform:scale(1.2);  opacity:1;   }
+}
+
+/* ============================================================
+   2b. NAV-LOADING — Overlay saat berganti fitur/halaman
+   Tampil di atas area konten, di bawah overlay penuh.
+   Bintang 0.5x ukuran overlay utama, kecepatan sama 0.5x.
+   ============================================================ */
+/* ============================================================
+   2b. NAV-LOADING — Overlay area konten saat berganti fitur
+   Fix: tidak menutupi sidebar, bintang diperbesar & dipercantik,
+   teks berputar ramah anak, kecepatan 0.5×.
+   ============================================================ */
+
+/* Overlay hanya di area konten — sidebar tidak tertutup */
+#nav-loading {
+    position: fixed;
+    top: var(--navbar-h);          /* tepat bawah navbar atas */
+    left: var(--sidebar-w);        /* mulai setelah sidebar */
+    right: 0;
+    bottom: 0;
+    background: rgba(248, 250, 252, 0.97); /* hampir solid, tidak buram */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    animation: navLoadIn 0.22s ease forwards;
+}
+/* Saat sidebar tersembunyi (toggled), overlay penuh konten — JS juga handle ini */
+#wrapper.toggled ~ * #nav-loading { left: 0; }
+#nav-loading.d-none { display: none !important; }
+
+@keyframes navLoadIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Konten tengah nav-loading ── */
+.nav-loading-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0;
+    /* Geser sedikit ke atas agar secara visual tampak di tengah area konten */
+    margin-top: -40px;
+}
+
+/* Lottie wrapper */
+.nav-lottie-wrap {
+    width: 140px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── CSS Fallback — Panggung bintang diperbesar ── */
+.nav-star-stage {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 4px;
+    display: none;
+}
+/* aktif = fallback ditampilkan (Lottie gagal) ATAU default saat offline */
+.nav-star-stage.aktif { display: block; }
+
+/* Bintang utama — lebih besar, glow cerah */
+.nav-star-main {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: starPulse 3.6s ease-in-out infinite,
+               starSpin  8.0s linear infinite;
+    filter: drop-shadow(0 0 12px rgba(239,159,39,0.65))
+            drop-shadow(0 0 4px rgba(239,159,39,0.4));
+}
+
+/* 4 bintang orbit — posisi merata di 4 sudut */
+.nav-star-orb { position: absolute; }
+.nav-orb--1 { top: 8px;    left: 8px;    animation: orb1 4.8s ease-in-out infinite, orbSpin 6.4s linear infinite; }
+.nav-orb--2 { top: 8px;    right: 8px;   animation: orb2 5.6s ease-in-out infinite, orbSpin 5.2s linear infinite reverse; }
+.nav-orb--3 { bottom: 8px; right: 8px;   animation: orb3 4.0s ease-in-out infinite, orbSpin 7.6s linear infinite; }
+.nav-orb--4 { bottom: 8px; left: 8px;    animation: orb4 6.4s ease-in-out infinite, orbSpin 4.8s linear infinite reverse; }
+
+/* Kilap kecil — tersebar di antara bintang */
+.nav-twinkle {
+    position: absolute;
+    border-radius: 50%;
+}
+.ntw-1 { width:7px; height:7px; background:#EF9F27; top:2px;    left:50%;   animation: twinklePop 3.6s ease-in-out infinite 0s;   }
+.ntw-2 { width:5px; height:5px; background:#7F77DD; top:30%;    right:2px;  animation: twinklePop 4.4s ease-in-out infinite 1.0s; }
+.ntw-3 { width:6px; height:6px; background:#D85A30; bottom:2px; left:35%;   animation: twinklePop 3.2s ease-in-out infinite 1.8s; }
+.ntw-4 { width:5px; height:5px; background:#1D9E75; bottom:25%; left:2px;   animation: twinklePop 4.0s ease-in-out infinite 0.6s; }
+
+/* ── Teks ramah anak — nav-loading ── */
+.nav-loading-text {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    min-height: 3rem;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+/* Titik loader nav — sedikit lebih kecil dari overlay utama */
+.nav-dots { margin-top: 12px; }
+.nav-dots .ld { width: 9px; height: 9px; }
+
+
+/* ============================================================
+   3. TOAST NOTIFIKASI
+   ============================================================ */
+#toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: #fff;
+    background: var(--text-primary);
+    box-shadow: var(--shadow-lg);
+    animation: muncul 0.3s ease;
+    min-width: 240px;
+    max-width: 320px;
+}
+.toast-item.sukses  { background: #0d9e74; }
+.toast-item.galat   { background: var(--danger); }
+.toast-item.info    { background: var(--primary); }
+
+@keyframes muncul {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   4. HALAMAN LOGIN
+   Gambar 4.1 Skripsi — "panel visual di sisi kiri (foto sekolah)
+   dan panel formulir di sisi kanan"
+   ============================================================ */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--bg-page);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 900px;
+    min-height: 490px;
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    display: flex;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Panel kiri — foto sekolah */
+.login-visual {
+    flex: 1.2;
+    position: relative;
+    min-height: 280px;
+    background: linear-gradient(135deg, var(--primary), #0099cc);
+    display: flex;
+    align-items: flex-end;
+}
+.login-visual-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.login-visual-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(13,110,253,0.15) 0%,
+        rgba(13,110,253,0.85) 100%
+    );
+    z-index: 1;
+}
+.login-visual-text {
+    position: relative;
+    z-index: 2;
+    padding: 28px;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+}
+.login-visual-text h2 { font-size: 1.5rem; }
+
+/* Panel kanan — form */
+.login-form-panel {
+    flex: 1;
+    padding: 38px 42px;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+.login-form-inner { width: 100%; }
+
+/* Logo bundaran */
+.login-logo-wrap {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary), #0099cc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(13,110,253,0.35);
+}
+
+/* ============================================================
+   5. ROLE SELECTOR (Siswa / Guru)
+   Skripsi BAB IV: "Pengguna memilih peran terlebih dahulu antara Siswa atau Guru"
+   ============================================================ */
+.role-selector {
+    background: #f1f3f5;
+    padding: 5px;
+    border-radius: var(--radius-full);
+    gap: 4px;
+}
+
+.btn-role {
+    flex: 1;
+    border: none;
+    padding: 10px 14px;
+    border-radius: var(--radius-full);
+    background: transparent;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background var(--ease), color var(--ease), box-shadow var(--ease);
+}
+.btn-role.active,
+.btn-role:hover {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(13,110,253,0.35);
+}
+
+/* ============================================================
+   6. INPUT KUSTOM (login form)
+   ============================================================ */
+.input-custom {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: #fff;
+    transition: border-color var(--ease), box-shadow var(--ease);
+}
+.input-custom:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.12);
+}
+.input-custom.error { border-color: var(--danger); }
+
+.input-custom-icon {
+    display: flex;
+    align-items: center;
+    padding: 0 13px;
+    color: var(--text-muted);
+    background: #f8f9fa;
+    border-right: 1px solid var(--border-color);
+    height: 44px;
+    font-size: 0.9rem;
+}
+.input-custom-field {
+    flex: 1;
+    border: none;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9rem;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+}
+.input-custom-field::placeholder { color: var(--text-muted); }
+
+.input-custom-btn {
+    background: #f8f9fa;
+    border: none;
+    border-left: 1px solid var(--border-color);
+    padding: 0 14px;
+    height: 44px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: background var(--ease), color var(--ease);
+}
+.input-custom-btn:hover { background: #e9ecef; color: var(--primary); }
+
+/* Alert login */
+.alert-login {
+    background: var(--danger-bg);
+    border: 1px solid #f5c6cb;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #842029;
+    margin-bottom: 12px;
+}
+.alert-login.d-none { display: none !important; }
+
+/* Tombol Masuk */
+.btn-masuk {
+    width: 100%;
+    padding: 0.78rem;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background var(--ease), box-shadow var(--ease), transform var(--ease);
+}
+.btn-masuk:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 14px rgba(13,110,253,0.4);
+    transform: translateY(-1px);
+}
+.btn-masuk:active { transform: translateY(0); }
+
+/* ============================================================
+   7. SIDEBAR
+   Skripsi BAB IV: "sidebar navigasi"
+   ============================================================ */
+#sidebar-wrapper {
+    min-width: var(--sidebar-w);
+    max-width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--primary);
+    display: flex;
+    flex-direction: column;
+    transition: margin var(--ease);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 200;
+}
+
+/* Toggle sidebar (Gambar 4.2 skripsi) */
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: calc(-1 * var(--sidebar-w));
+}
+
+/* Brand sidebar */
+.sidebar-brand {
+    padding: 1.5rem 1rem 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.sidebar-brand-icon {
+    font-size: 2rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 0.4rem;
+}
+.sidebar-brand-title {
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.06em;
+    font-size: 1rem;
+    margin: 0.2rem 0 0;
+}
+.sidebar-brand-sub {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.72rem;
+    display: block;
+}
+
+/* Menu navigasi */
+.sidebar-nav { flex: 1; padding: 0.5rem 0; }
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 20px;
+    color: rgba(255,255,255,0.82);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-left: 3px solid transparent;
+    transition: background var(--ease), padding-left var(--ease), color var(--ease), border-color var(--ease);
+}
+.sidebar-nav a i {
+    width: 18px;
+    text-align: center;
+    font-size: 0.95rem;
+    opacity: 0.75;
+    flex-shrink: 0;
+}
+.sidebar-nav a:hover {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    padding-left: 26px;
+}
+.sidebar-nav a.aktif {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border-left-color: #fff;
+    font-weight: 600;
+}
+.sidebar-nav a.aktif i { opacity: 1; }
+
+/* Footer sidebar */
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    margin-top: auto;
+}
+.sidebar-user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.sidebar-user-photo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.sidebar-user-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
+}
+.sidebar-user-role {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.6);
+}
+
+/* ============================================================
+   8. NAVBAR ATAS
+   ============================================================ */
+.top-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-card);
+    height: var(--navbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Tombol toggle sidebar */
+/* Skripsi BAB IV: "fitur toggle sidebar yang memungkinkan pengguna
+   menyembunyikan atau menampilkan panel navigasi" */
+.btn-toggle-sidebar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-ultra);
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--primary);
+    font-size: 1rem;
+    transition: background var(--ease);
+}
+.btn-toggle-sidebar:hover { background: var(--primary-light); }
+
+.top-navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ============================================================
+   9. NOTIFIKASI
+   ============================================================ */
+.btn-notif {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-ultra);
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    transition: background var(--ease), color var(--ease);
+}
+.btn-notif:hover { background: var(--primary-light); color: var(--primary); }
+
+.notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--danger);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+}
+
+.notif-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 300px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    display: none;
+    z-index: 500;
+}
+.notif-panel.tampil { display: block; }
+
+.notif-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: 4px 12px 8px;
+    letter-spacing: 0.05em;
+}
+
+.notif-item {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--ease);
+    margin-bottom: 4px;
+    background: var(--primary-ultra);
+}
+.notif-item:hover { background: var(--primary-light); }
+.notif-item:last-child { margin-bottom: 0; }
+
+.notif-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+.notif-desc { font-size: 0.75rem; color: var(--text-secondary); }
+
+/* ============================================================
+   10. PROFIL CHIP & DROPDOWN
+   Skripsi BAB IV: "dropdown foto profil di navbar"
+   ============================================================ */
+.profil-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 14px 5px 5px;
+    background: var(--primary-ultra);
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background var(--ease);
+}
+.profil-chip:hover { background: var(--primary-light); }
+
+.profil-chip-img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(13,110,253,0.3);
+}
+.profil-chip-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.1;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.profil-chip-role { font-size: 0.7rem; color: var(--text-secondary); }
+.profil-chip-arrow { font-size: 9px; color: var(--text-muted); }
+
+.profil-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 210px;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    display: none;
+    z-index: 500;
+}
+.profil-dropdown.tampil { display: block; }
+
+.profil-dropdown-header {
+    padding: 8px 12px 10px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 6px;
+}
+.profil-dropdown-name { font-weight: 700; font-size: 0.9rem; }
+.profil-dropdown-role { font-size: 0.75rem; color: var(--text-secondary); }
+
+.profil-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: background var(--ease);
+}
+.profil-dropdown-item:hover { background: var(--primary-ultra); }
+.profil-dropdown-item.danger { color: var(--danger); }
+.profil-dropdown-item.danger:hover { background: var(--danger-bg); }
+.profil-dropdown-item i { width: 16px; text-align: center; }
+
+.profil-dropdown-divider {
+    margin: 6px 0;
+    border-color: var(--border-color);
+}
+
+/* ============================================================
+   11. AREA KONTEN UTAMA
+   ============================================================ */
+#page-content-wrapper { overflow: hidden; }
+
+.konten-area {
+    padding: 1.5rem;
+    min-height: calc(100vh - var(--navbar-h));
+}
+
+/* Header section */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+}
+.section-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+.section-header-sub {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+/* Kartu konten */
+.kartu {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: box-shadow var(--ease);
+}
+.kartu:hover { box-shadow: var(--shadow-lg); }
+
+/* ============================================================
+   12. KARTU STATISTIK — Dashboard
+   Gambar 4.2, 4.3 Skripsi
+   ============================================================ */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.stat-kartu {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: box-shadow var(--ease), transform var(--ease);
+}
+.stat-kartu:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+.stat-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+/* Welcome banner */
+.welcome-banner {
+    background: linear-gradient(135deg, var(--primary), #0099cc);
+    border-radius: var(--radius-lg);
+    padding: 1.4rem 1.6rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 20px rgba(13,110,253,0.3);
+}
+.welcome-banner img {
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.6);
+    flex-shrink: 0;
+}
+.welcome-banner h5 { font-weight: 800; margin: 0 0 2px; }
+.welcome-banner small { opacity: 0.85; }
+
+/* Pengumuman */
+.pengumuman-kartu {
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    background: var(--primary-ultra);
+    border-left: 4px solid var(--primary);
+    margin-bottom: 10px;
+}
+.pengumuman-kartu:last-child { margin-bottom: 0; }
+.pengumuman-kartu.hijau { border-left-color: var(--success); }
+.pengumuman-kartu.kuning { border-left-color: var(--warning); }
+
+.px-judul { font-weight: 600; font-size: 0.875rem; margin-bottom: 4px; }
+.px-isi   { font-size: 0.82rem; color: var(--text-secondary); }
+.px-tanggal { font-size: 0.72rem; color: var(--text-muted); margin-top: 6px; }
+
+/* ============================================================
+   13. TABEL
+   ============================================================ */
+.tabel-wrapper { overflow-x: auto; }
+
+.tabel {
+    width: 100%;
+    border-collapse: collapse;
+}
+.tabel thead th {
+    background: var(--primary-ultra);
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--primary-light);
+    white-space: nowrap;
+}
+.tabel tbody td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+.tabel tbody tr:last-child td { border-bottom: none; }
+.tabel tbody tr:hover td { background: var(--primary-ultra); }
+
+/* Badge status */
+.badge-lulus {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: var(--success-bg);
+    color: #0d9e74;
+}
+.badge-remidi {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: #fde8d8;
+    color: #c0622a;
+}
+.badge-tipe {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: #f1f3f5;
+    color: var(--text-secondary);
+}
+
+/* Progress bar nilai */
+.nilai-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.nilai-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.nilai-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+/* ============================================================
+   14. MATERI GRID
+   Gambar 4.4 Skripsi — "Tampilan Fitur Unggah Materi (Guru)"
+   ============================================================ */
+.materi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.materi-kartu {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow var(--ease), transform var(--ease);
+}
+.materi-kartu:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+.materi-ikon { font-size: 2.2rem; line-height: 1; }
+.materi-judul {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    flex: 1;
+    line-height: 1.4;
+}
+.materi-meta { font-size: 0.75rem; color: var(--text-secondary); }
+
+/* ============================================================
+   15. UPLOAD ZONE
+   Gambar 4.4 Skripsi — "progress bar selama proses unggah"
+   ============================================================ */
+.upload-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    background: #fafbff;
+    transition: border-color var(--ease), background var(--ease);
+}
+.upload-zone:hover,
+.upload-zone.drag-aktif {
+    border-color: var(--primary);
+    background: var(--primary-ultra);
+}
+.upload-zone-ikon { font-size: 2.8rem; color: var(--text-muted); }
+.upload-zone-judul {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+}
+.upload-zone-sub { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+.upload-nama-file {
+    margin-top: 8px;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Progress bar upload */
+.progress-wrap { margin-top: 12px; display: none; }
+.progress-bg {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 8px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+.progress-status { font-size: 0.8rem; color: var(--text-secondary); }
+
+/* ============================================================
+   16. KAHOOT
+   Gambar 4.5 Skripsi — "Tampilan Fitur Kuis Kahoot!"
+   ============================================================ */
+.btn-kahoot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--kahoot);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 0.9rem 2.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition: background var(--ease), transform var(--ease), box-shadow var(--ease);
+}
+.btn-kahoot:hover {
+    background: var(--kahoot-dark);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(70,23,143,0.35);
+}
+.btn-kahoot:active { transform: translateY(-1px); }
+
+.pin-display {
+    display: inline-block;
+    background: #f8f9fa;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 2.5rem;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: var(--primary);
+}
+
+/* ============================================================
+   17. TOMBOL UMUM
+   ============================================================ */
+.btn-aksi {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.55rem 1.1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: background var(--ease), transform var(--ease);
+}
+.btn-aksi:active { transform: scale(0.97); }
+.btn-aksi.primer { background: var(--primary); color: #fff; }
+.btn-aksi.primer:hover { background: var(--primary-dark); color: #fff; }
+.btn-aksi.bahaya { background: #fff5f5; color: var(--danger); border: 1px solid #f5c6cb; }
+.btn-aksi.bahaya:hover { background: #fde8d8; }
+.btn-aksi.abu { background: #f1f3f5; color: var(--text-secondary); }
+.btn-aksi.abu:hover { background: #e2e6ea; color: var(--text-primary); }
+
+/* Tombol submit form */
+.btn-simpan {
+    width: 100%;
+    padding: 0.78rem;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background var(--ease), box-shadow var(--ease);
+}
+.btn-simpan:hover {
+    background: var(--primary-dark);
+    box-shadow: 0 4px 14px rgba(13,110,253,0.4);
+}
+
+/* ============================================================
+   18. PROFIL
+   Skripsi BAB IV: "Fitur Edit Profil"
+   ============================================================ */
+.profil-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 4px solid var(--primary);
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   19. RESPONSIVE
+   Skripsi BAB III Spesifikasi: "Sistem dirancang responsif
+   agar dapat digunakan baik melalui komputer maupun perangkat mobile"
+   ============================================================ */
+@media (max-width: 1199px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+    /* Sidebar tersembunyi di mobile */
+    #sidebar-wrapper { margin-left: calc(-1 * var(--sidebar-w)); }
+    #wrapper.toggled #sidebar-wrapper { margin-left: 0; }
+
+    /* Nav-loading di mobile = mulai dari kiri layar (sidebar tidak tampil) */
+    #nav-loading { left: 0 !important; top: var(--navbar-h); }
+
+    /* Login card: panel foto disembunyikan */
+    .login-card { flex-direction: column; border-radius: var(--radius-lg); }
+    .login-form-panel { padding: 30px 24px; }
+
+    .konten-area { padding: 1rem; }
+
+    .upload-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 576px) {
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .login-form-panel { padding: 24px 18px; }
+}
+
+/* ============================================================
+   20. MODAL INPUT / EDIT NILAI (GURU)
+   Refactor: fitur CRUD Rekap Nilai
+   ============================================================ */
+
+/* Overlay gelap */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.modal-overlay.tampil { opacity: 1; }
+.modal-overlay.d-none  { display: none !important; }
+
+/* Kotak modal */
+.modal-box {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 560px;
+    max-height: 92vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(12px);
+    transition: transform 0.22s ease;
+}
+.modal-overlay.tampil .modal-box {
+    transform: translateY(0);
+}
+
+/* Header modal */
+.modal-header-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    z-index: 1;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+.modal-title-custom {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+.modal-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f3f5;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: background var(--ease), color var(--ease);
+    flex-shrink: 0;
+}
+.modal-close-btn:hover { background: var(--danger-bg); color: var(--danger); }
+
+/* Body modal */
+.modal-body-custom {
+    padding: 1.25rem 1.5rem;
+    flex: 1;
+}
+
+/* Footer modal */
+.modal-footer-custom {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    background: #fafbff;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    position: sticky;
+    bottom: 0;
+}
+
+/* Grid input nilai (2×2) */
+.nilai-input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Display nilai akhir */
+.nilai-akhir-display {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    background: var(--primary-ultra);
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-sm);
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: var(--primary);
+}
+
+/* Badge status di dalam display nilai akhir */
+.nilai-akhir-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+}
+.nilai-akhir-badge.lulus {
+    background: var(--success-bg);
+    color: #0d9e74;
+}
+.nilai-akhir-badge.remidi {
+    background: #fde8d8;
+    color: #c0622a;
+}
+
+/* Tombol aksi ukuran kecil */
+.btn-aksi-sm {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.78rem !important;
+}
+
+/* Panel detail nilai per siswa */
+#panel-detail-nilai .kartu {
+    border-left: 4px solid var(--primary);
+}
+
+/* Kolom Aksi di tabel rekap */
+.tabel th:last-child,
+.tabel td:last-child {
+    white-space: nowrap;
+}
+
+/* Responsive modal */
+@media (max-width: 576px) {
+    .modal-box { max-width: 100%; border-radius: var(--radius-lg); }
+    .nilai-input-grid { grid-template-columns: 1fr; }
+    .modal-header-custom,
+    .modal-body-custom,
+    .modal-footer-custom { padding-left: 1rem; padding-right: 1rem; }
+}
+
+/* ============================================================
+   FIX VERSI PHP+MySQL — tambahan minimal, tidak mengubah desain asli
+   ============================================================ */
+
+/* 1. Global d-none agar login & dashboard tidak tumpang tindih */
+.d-none { display: none !important; }
+
+/* 2. Dashboard screen layout */
+#dashboard-screen { display: flex; flex-direction: column; height: 100vh; }
+#dashboard-screen.d-none { display: none !important; }
+
+/* 3. Pastikan wrapper, page-content, dan konten area mengisi tinggi penuh */
+#wrapper { flex: 1; display: flex !important; min-height: 0; }
+#page-content-wrapper { flex: 1; display: flex !important; flex-direction: column; min-width: 0; }
+.top-navbar { flex-shrink: 0; }
+#sidebar-wrapper { flex-shrink: 0; }
+.konten-area { flex: 1; overflow-y: auto; min-height: 0; }

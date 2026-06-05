@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Learning SDN 74 Krui</title>
+    <link href="lib/bootstrap.min.css" rel="stylesheet">
+    <link href="lib/font-awesome/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Lottie Player (lokal) -->
+<script src="lib/lottie-player.js" defer></script>
+
+<!-- ===================================================
+     LOADING OVERLAY — Login / Logout
+     Gambar 4.1 - Skripsi BAB IV:
+     Animasi bintang belajar (Ceria · Memotivasi)
+     Lottie Player (primary) + CSS-only fallback
+==================================================== -->
+<div id="loading-overlay" class="d-none" role="status" aria-label="Sedang memuat, harap tunggu">
+    <div class="loading-inner">
+        <!-- Lottie primary -->
+        <div class="lottie-wrap" id="lottie-wrap">
+            <lottie-player
+                id="lottie-star"
+                src="lib/star-anim.json"
+                background="transparent"
+                speed="0.5"
+                style="width:180px;height:180px;"
+                loop autoplay aria-hidden="true">
+            </lottie-player>
+        </div>
+        <!-- CSS-only fallback -->
+        <div class="star-stage" id="star-fallback" aria-hidden="true">
+            <div class="star-main"><svg viewBox="0 0 60 60" width="68" height="68"><polygon class="star-poly star-poly--main" points="30,4 36.5,22 56,22 40.5,34 47,52 30,40 13,52 19.5,34 4,22 23.5,22"/></svg></div>
+            <div class="star-orb star-orb--1"><svg viewBox="0 0 36 36" width="26" height="26"><polygon class="star-poly star-poly--1" points="18,2 21.5,12 33,12 24,19 27.5,29 18,22 8.5,29 12,19 3,12 14.5,12"/></svg></div>
+            <div class="star-orb star-orb--2"><svg viewBox="0 0 36 36" width="20" height="20"><polygon class="star-poly star-poly--2" points="18,2 21.5,12 33,12 24,19 27.5,29 18,22 8.5,29 12,19 3,12 14.5,12"/></svg></div>
+            <div class="star-orb star-orb--3"><svg viewBox="0 0 36 36" width="18" height="18"><polygon class="star-poly star-poly--3" points="18,2 21.5,12 33,12 24,19 27.5,29 18,22 8.5,29 12,19 3,12 14.5,12"/></svg></div>
+            <div class="star-orb star-orb--4"><svg viewBox="0 0 36 36" width="22" height="22"><polygon class="star-poly star-poly--4" points="18,2 21.5,12 33,12 24,19 27.5,29 18,22 8.5,29 12,19 3,12 14.5,12"/></svg></div>
+            <span class="twinkle tw-1"></span><span class="twinkle tw-2"></span>
+            <span class="twinkle tw-3"></span><span class="twinkle tw-4"></span>
+            <span class="twinkle tw-5"></span>
+        </div>
+        <!-- Teks ramah anak (berputar via JS) -->
+        <p class="loading-text" id="loading-text-msg">Sedang memuat materi,<br>tunggu sebentar ya!</p>
+        <!-- Titik loader tiga warna -->
+        <div class="loading-dots" aria-hidden="true">
+            <span class="ld ld--1"></span>
+            <span class="ld ld--2"></span>
+            <span class="ld ld--3"></span>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================
+     NAV-LOADING — Animasi saat berganti fitur/halaman
+     Skripsi BAB IV: feedback visual antar-navigasi.
+     Hanya menutupi area konten (bukan sidebar).
+     Bintang diperbesar & dipercantik, kecepatan 0.5×.
+==================================================== -->
+<div id="nav-loading" class="d-none" role="status" aria-label="Memuat halaman">
+    <div class="nav-loading-inner">
+
+        <!-- Lottie primary (lokal) -->
+        <div class="nav-lottie-wrap" id="nav-lottie-wrap">
+            <lottie-player
+                id="nav-lottie-star"
+                src="lib/star-anim.json"
+                background="transparent"
+                speed="0.5"
+                style="width:140px;height:140px;"
+                loop autoplay aria-hidden="true">
+            </lottie-player>
+        </div>
+
+        <!-- CSS fallback — diperbesar & 4 orbit penuh -->
+        <div class="nav-star-stage aktif" id="nav-star-fallback" aria-hidden="true">
+            <!-- Bintang utama -->
+            <div class="nav-star-main">
+                <svg viewBox="0 0 60 60" width="64" height="64">
+                    <polygon class="star-poly star-poly--main"
+                             points="30,4 36.5,22 56,22 40.5,34 47,52 30,40 13,52 19.5,34 4,22 23.5,22"/>
+                </svg>
+            </div>
+            <!-- Orbit kiri-atas: ungu -->
+            <div class="nav-star-orb nav-orb--1">
+                <svg viewBox="0 0 36 36" width="22" height="22">
+                    <polygon class="star-poly star-poly--1"
+                             points="18,2 21.5,12 33,12 24,19 27.5,29 18,22 8.5,29 12,19 3,12 14.5,12"/>
+                </svg>
+            </div>
+            <!-- Orbit kanan-atas: coral -->
+            <div class="nav-star-orb nav-orb--2">
+                <svg viewBox="0 0 36 36" width="17" height="17">
+                    <polygon class="star-poly star-poly--2"
+                             points="18,2 21.5,12 33,12 24,19 27.5,29 18,22 8.5,29 12,19 3,12 14.5,12"/>
+                </svg>
+            </div>
+            <!-- Orbit kanan-bawah: hijau -->
+            <div class="nav-star-orb nav-orb--3">
+                <svg viewBox="0 0 36 36" width="15" height="15">
+                    <polygon class="star-poly star-poly--3"
+                             points="18,2 21.5,12 33,12 24,19 27.5,29 18,22 8.5,29 12,19 3,12 14.5,12"/>
+                </svg>
+            </div>
+            <!-- Orbit kiri-bawah: pink -->
+            <div class="nav-star-orb nav-orb--4">
+                <svg viewBox="0 0 36 36" width="19" height="19">
+                    <polygon class="star-poly star-poly--4"
+                             points="18,2 21.5,12 33,12 24,19 27.5,29 18,22 8.5,29 12,19 3,12 14.5,12"/>
+                </svg>
+            </div>
+            <!-- Kilap -->
+            <span class="nav-twinkle ntw-1"></span>
+            <span class="nav-twinkle ntw-2"></span>
+            <span class="nav-twinkle ntw-3"></span>
+            <span class="nav-twinkle ntw-4"></span>
+        </div>
+
+        <!-- Teks ramah anak -->
+        <p class="nav-loading-text" id="nav-loading-text-msg">
+            Sedang memuat materi,<br>tunggu sebentar ya!
+        </p>
+
+        <!-- Titik loader -->
+        <div class="loading-dots nav-dots" aria-hidden="true">
+            <span class="ld ld--1"></span>
+            <span class="ld ld--2"></span>
+            <span class="ld ld--3"></span>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================
+     TOAST NOTIFIKASI
+==================================================== -->
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- ===================================================
+     LAYAR LOGIN
+     Gambar 4.1 - Skripsi BAB IV:
+     "panel visual di sisi kiri (foto sekolah SDN 74 Krui)
+      dan panel formulir di sisi kanan"
+     Fitur: pilih peran (Siswa/Guru), NISN/NIP, kata sandi
+==================================================== -->
+<div id="login-screen" class="login-container">
+    <div class="login-card shadow-lg">
+
+        <!-- Panel kiri: foto sekolah -->
+        <div class="login-visual d-none d-md-flex" aria-hidden="true">
+            <img src="sd 74 krui.jpg"
+                 alt="SD Negeri 74 Krui"
+                 class="login-visual-img"
+                 onerror="this.style.display='none'">
+            <div class="login-visual-overlay"></div>
+            <div class="login-visual-text">
+                <h2 class="fw-bold mb-1">Selamat Datang!</h2>
+                <p class="mb-0 opacity-90">E-Learning SD Negeri 74 Krui</p>
+                <p class="mb-0 opacity-75 small">Pesisir Barat, Lampung</p>
+            </div>
+        </div>
+
+        <!-- Panel kanan: form login -->
+        <div class="login-form-panel">
+            <div class="login-form-inner">
+
+                <!-- Logo & Judul -->
+                <div class="text-center mb-4">
+                    <div class="login-logo-wrap mx-auto mb-3">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h4 class="fw-bold text-primary mb-1">E-Learning SDN 74 Krui</h4>
+                    <p class="text-muted small mb-0">Sistem Informasi Pembelajaran Digital</p>
+                </div>
+
+                <!-- Pilih Peran: Siswa / Guru -->
+                <!-- Skripsi BAB IV: "Pengguna memilih peran terlebih dahulu
+                     antara Siswa atau Guru" -->
+                <div class="role-selector d-flex mb-4" role="group" aria-label="Pilih peran pengguna">
+                    <button type="button" id="btn-siswa"
+                            class="btn-role active"
+                            onclick="setRole('siswa')"
+                            aria-pressed="true">
+                        <i class="fas fa-user-graduate me-2"></i>Siswa
+                    </button>
+                    <button type="button" id="btn-guru"
+                            class="btn-role"
+                            onclick="setRole('guru')"
+                            aria-pressed="false">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>Guru
+                    </button>
+                    <button type="button" id="btn-kepsek"
+                            class="btn-role"
+                            onclick="setRole('kepsek')"
+                            aria-pressed="false"
+                            style="font-size:.82rem">
+                        <i class="fas fa-user-tie me-2"></i>Kepsek
+                    </button>
+                </div>
+
+                <!-- Form Login -->
+                <form id="formLogin" novalidate>
+
+                    <!-- NISN / NIP -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small" id="label-user" for="userInput">
+                            NISN SISWA
+                        </label>
+                        <div class="input-custom" id="wrap-user">
+                            <span class="input-custom-icon">
+                                <i class="fas fa-id-card"></i>
+                            </span>
+                            <input type="text"
+                                   id="userInput"
+                                   class="input-custom-field"
+                                   placeholder="Contoh: 1234567890"
+                                   autocomplete="username"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Kata Sandi -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small" for="passInput">
+                            KATA SANDI
+                        </label>
+                        <div class="input-custom" id="wrap-pass">
+                            <span class="input-custom-icon">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password"
+                                   id="passInput"
+                                   class="input-custom-field"
+                                   placeholder="••••••••"
+                                   autocomplete="current-password"
+                                   required>
+                            <button type="button"
+                                    class="input-custom-btn"
+                                    onclick="toggleSandi()"
+                                    aria-label="Tampilkan kata sandi">
+                                <i class="fas fa-eye" id="eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pesan error -->
+                    <div class="alert-login d-none" id="login-alert" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span id="login-alert-msg"></span>
+                    </div>
+
+                    <!-- Tombol Masuk -->
+                    <button type="submit" class="btn-masuk w-100">
+                        <i class="fas fa-sign-in-alt me-2"></i>MASUK
+                    </button>
+                </form>
+
+                <p class="text-center text-muted small mt-4 mb-0">
+                    <i class="fas fa-info-circle me-1 text-primary"></i>
+                    <a href="#" onclick="bukaLupaPassword(); return false;" style="color:#0d6efd;text-decoration:none">
+                        Lupa kata sandi?
+                    </a>
+                    &nbsp;·&nbsp;
+                    <a href="#" onclick="bukaRegister(); return false;" style="color:#0d6efd;text-decoration:none">
+                        Daftar akun baru
+                    </a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================
+     LAYAR REGISTRASI
+==================================================== -->
+<div id="register-screen" class="login-container d-none">
+    <div class="login-card">
+        <div class="login-form-side" style="max-width:500px;margin:auto;padding:2.5rem">
+            <div class="text-center mb-4">
+                <div class="login-logo-wrap"><i class="fas fa-graduation-cap"></i></div>
+                <h4 class="fw-bold mt-3" style="color:#0d6efd">Daftar Akun Baru</h4>
+                <p class="text-muted small">E-Learning SDN 74 Krui</p>
+            </div>
+            <div id="register-alert" class="alert-login d-none">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="register-alert-msg"></span>
+            </div>
+            <div class="role-selector d-flex mb-4">
+                <button type="button" id="rbtn-siswa" class="role-btn active" onclick="setRoleRegister('siswa')">
+                    <i class="fas fa-user-graduate me-2"></i>Siswa
+                </button>
+                <button type="button" id="rbtn-guru" class="role-btn" onclick="setRoleRegister('guru')">
+                    <i class="fas fa-chalkboard-teacher me-2"></i>Guru
+                </button>
+            </div>
+            <form id="formRegister" novalidate>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">NAMA LENGKAP *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" id="rinput-nama" class="form-control" placeholder="Nama lengkap" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small" id="rlabel-id">NISN SISWA *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" id="rinput-id" class="form-control" placeholder="Contoh: 1234567890" required>
+                    </div>
+                </div>
+                <div class="mb-3" id="wrap-kelas">
+                    <label class="form-label fw-semibold small">KELAS</label>
+                    <select id="rinput-kelas" class="form-select">
+                        <option>V A</option><option>V B</option>
+                    </select>
+                </div>
+                <div class="mb-3 d-none" id="wrap-mapel">
+                    <label class="form-label fw-semibold small">MATA PELAJARAN / JABATAN</label>
+                    <input type="text" id="rinput-mapel" class="form-control" placeholder="Contoh: Wali Kelas V A">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">KATA SANDI *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="rinput-sandi" class="form-control" placeholder="Minimal 6 karakter" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small">KONFIRMASI KATA SANDI *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="rinput-konfirmasi" class="form-control" placeholder="Ulangi kata sandi" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-masuk w-100">
+                    <i class="fas fa-user-plus me-2"></i>DAFTAR SEKARANG
+                </button>
+            </form>
+            <p class="text-center text-muted small mt-4 mb-0">
+                Sudah punya akun?
+                <a href="#" onclick="tutupRegister(); return false;" style="color:#0d6efd;text-decoration:none">
+                    Masuk di sini
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================
+     LAYAR LUPA PASSWORD
+==================================================== -->
+<div id="lupa-screen" class="login-container d-none">
+    <div class="login-card">
+        <div class="login-form-side" style="max-width:500px;margin:auto;padding:2.5rem">
+            <div class="text-center mb-4">
+                <div class="login-logo-wrap"><i class="fas fa-key"></i></div>
+                <h4 class="fw-bold mt-3" style="color:#0d6efd">Reset Kata Sandi</h4>
+                <p class="text-muted small">Masukkan ID dan nama sesuai data terdaftar</p>
+            </div>
+            <div id="lupa-alert" class="alert-login d-none">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="lupa-alert-msg"></span>
+            </div>
+            <div class="role-selector d-flex mb-4">
+                <button type="button" id="lbtn-siswa" class="role-btn active" onclick="setRoleLupa('siswa')">
+                    <i class="fas fa-user-graduate me-2"></i>Siswa
+                </button>
+                <button type="button" id="lbtn-guru" class="role-btn" onclick="setRoleLupa('guru')">
+                    <i class="fas fa-chalkboard-teacher me-2"></i>Guru
+                </button>
+            </div>
+            <form id="formLupa" novalidate>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small" id="llabel-id">NISN SISWA *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-id-card input-icon"></i>
+                        <input type="text" id="linput-id" class="form-control" placeholder="Contoh: 1234567890" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">NAMA LENGKAP *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" id="linput-nama" class="form-control" placeholder="Nama sesuai data terdaftar" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">KATA SANDI BARU *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="linput-sandi-baru" class="form-control" placeholder="Minimal 6 karakter" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold small">KONFIRMASI KATA SANDI BARU *</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" id="linput-konfirmasi" class="form-control" placeholder="Ulangi kata sandi baru" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-masuk w-100">
+                    <i class="fas fa-save me-2"></i>RESET KATA SANDI
+                </button>
+            </form>
+            <p class="text-center text-muted small mt-4 mb-0">
+                Ingat kata sandi?
+                <a href="#" onclick="tutupLupaPassword(); return false;" style="color:#0d6efd;text-decoration:none">
+                    Kembali login
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================================
+     LAYAR DASHBOARD
+     Gambar 4.2, 4.3 - Skripsi BAB IV:
+     "sidebar navigasi dan navbar atas"
+     "menu yang berbeda tergantung peran pengguna"
+     "fitur toggle sidebar"
+==================================================== -->
+<div id="dashboard-screen" class="d-none" style="flex-direction:column;height:100vh">
+    <div id="wrapper" style="display:flex;flex:1;min-height:0;overflow:hidden">
+
+        <!-- SIDEBAR -->
+        <!-- Skripsi BAB IV: "Sidebar menampilkan menu yang berbeda
+             tergantung peran pengguna" -->
+        <nav id="sidebar-wrapper" aria-label="Menu navigasi utama">
+            <div class="sidebar-brand text-center">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h5 class="sidebar-brand-title">E-LEARNING</h5>
+                <small class="sidebar-brand-sub">SDN 74 KRUI</small>
+            </div>
+
+            <!-- Menu navigasi (diisi JS sesuai peran) -->
+            <div class="sidebar-nav" id="sidebar-nav" role="menubar"></div>
+
+            <!-- Info user di sidebar -->
+            <div class="sidebar-footer">
+                <div class="sidebar-user-info">
+                    <img id="sidebar-photo"
+                         src="lib/avatar-default.svg"
+                         alt="Foto profil" class="sidebar-user-photo"
+                         onerror="this.src='lib/avatar-default.svg'">
+                    <div>
+                        <div class="sidebar-user-name" id="sidebar-name">Pengguna</div>
+                        <div class="sidebar-user-role" id="sidebar-role">—</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- KONTEN UTAMA -->
+        <div id="page-content-wrapper" style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden">
+
+            <!-- NAVBAR ATAS -->
+            <nav class="top-navbar" aria-label="Navbar atas">
+                <!-- Toggle sidebar -->
+                <!-- Skripsi BAB IV: "fitur toggle sidebar yang memungkinkan
+                     pengguna menyembunyikan atau menampilkan panel navigasi" -->
+                <button class="btn-toggle-sidebar"
+                        id="menu-toggle"
+                        aria-controls="sidebar-wrapper"
+                        aria-label="Tampilkan/sembunyikan sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="top-navbar-right">
+
+                    <!-- Notifikasi -->
+                    <div class="notif-wrap position-relative">
+                        <button class="btn-notif"
+                                id="btn-notif"
+                                onclick="toggleNotif()"
+                                aria-label="Notifikasi"
+                                title="Notifikasi">
+                            <i class="fas fa-bell"></i>
+                            <span class="notif-badge" id="notif-badge">2</span>
+                        </button>
+                        <!-- Panel notifikasi -->
+                        <div class="notif-panel" id="notif-panel" aria-hidden="true">
+                            <div class="notif-header">NOTIFIKASI</div>
+                            <div class="notif-item" onclick="pindahHalaman('kuis'); tutupNotif();">
+                                <div class="notif-title">📌 Kuis Matematika Aktif</div>
+                                <div class="notif-desc">Senin, 14 April 2026 · 08.00 WIB via Kahoot</div>
+                            </div>
+                            <div class="notif-item" onclick="pindahHalaman('materi'); tutupNotif();">
+                                <div class="notif-title">📚 Materi IPA Baru</div>
+                                <div class="notif-desc">Sistem Tata Surya telah diunggah</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profil dropdown -->
+                    <div class="profil-wrap position-relative">
+                        <button class="profil-chip"
+                                id="profil-chip"
+                                onclick="toggleProfilMenu()"
+                                aria-expanded="false"
+                                aria-haspopup="true">
+                            <img id="display-photo"
+                                 src="lib/avatar-default.svg"
+                                 alt="Foto profil"
+                                 class="profil-chip-img"
+                                 onerror="this.src='lib/avatar-default.svg'">
+                            <div class="profil-chip-info d-none d-md-block">
+                                <div class="profil-chip-name" id="header-name">Pengguna</div>
+                                <div class="profil-chip-role" id="header-role">—</div>
+                            </div>
+                            <i class="fas fa-chevron-down profil-chip-arrow"></i>
+                        </button>
+
+                        <!-- Dropdown menu profil -->
+                        <div class="profil-dropdown" id="profil-dropdown" aria-hidden="true">
+                            <div class="profil-dropdown-header">
+                                <div class="profil-dropdown-name" id="dropdown-name">Pengguna</div>
+                                <div class="profil-dropdown-role" id="dropdown-role">—</div>
+                            </div>
+                            <a href="#" class="profil-dropdown-item"
+                               onclick="pindahHalaman('profil'); tutupProfilMenu(); return false;">
+                                <i class="fas fa-user-edit text-primary"></i>Edit Profil
+                            </a>
+                            <hr class="profil-dropdown-divider">
+                            <a href="#" class="profil-dropdown-item danger"
+                               onclick="doLogout(); return false;">
+                                <i class="fas fa-sign-out-alt"></i>Keluar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- AREA KONTEN DINAMIS -->
+            <!-- Semua halaman di-render di sini oleh JavaScript -->
+            <main id="dynamic-content"
+                  class="konten-area"
+                  role="main"
+                  tabindex="-1"
+                  aria-label="Konten utama">
+            </main>
+
+        </div><!-- /page-content-wrapper -->
+    </div><!-- /wrapper -->
+</div><!-- /dashboard-screen -->
+
+<script src="lib/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

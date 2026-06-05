@@ -1,0 +1,9 @@
+{
+  "name": "elearning-sdn74krui",
+  "version": "1.0.0",
+  "description": "E-Learning SD Negeri 74 Krui Pesisir Barat",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "parse-multipart-data": "^1.5.0"
+  }
+}
