@@ -1378,82 +1378,150 @@ function _refreshTabelRekap(rekap) {
    ============================================================ */
 async function renderProfil() {
     const u = STATE.user;
-
-    // Label yang benar per peran
     const labelID    = u.peran === 'siswa' ? 'NISN' : 'NIP';
     const nilaiID    = u.peran === 'siswa' ? (u.nisn||'') : (u.nip||'');
-    const labelExtra = u.peran === 'siswa' ? 'Kelas'
-                     : u.peran === 'kepsek' ? 'Jabatan'
-                     : 'Wali Kelas';
-    const nilaiExtra = u.peran === 'siswa' ? (u.kelas||'')
-                     : u.peran === 'kepsek' ? 'Kepala Sekolah'
-                     : (u.mapel||'');
-    const roleLabel  = u.peran === 'siswa'  ? `Siswa · Kelas ${u.kelas}`
-                     : u.peran === 'kepsek' ? `Kepala Sekolah`
-                     : `Guru · ${u.mapel}`;
+    const labelExtra = u.peran === 'siswa' ? 'Kelas' : u.peran === 'kepsek' ? 'Jabatan' : 'Wali Kelas';
+    const nilaiExtra = u.peran === 'siswa' ? (u.kelas||'') : u.peran === 'kepsek' ? 'Kepala Sekolah' : (u.mapel||'');
+    const roleLabel  = u.peran === 'siswa' ? `Siswa · Kelas ${u.kelas}` : u.peran === 'kepsek' ? 'Kepala Sekolah' : `Guru · ${u.mapel}`;
+    const warnaBadge = u.peran === 'siswa' ? '#27ae60' : u.peran === 'kepsek' ? '#8e44ad' : '#2980b9';
 
     el('dynamic-content').innerHTML = `
         <div class="section-header">
             <h3><i class="fas fa-user-edit me-2 text-primary"></i>Edit Profil</h3>
         </div>
-        <div class="kartu" style="max-width:500px">
-            <div class="text-center mb-4">
-                <div style="position:relative;display:inline-block">
-                    <img src="${fotoSrc(u.foto, u.nama)}" class="profil-avatar mb-3"
-                         id="profil-avatar" alt="Foto profil"
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;max-width:800px">
+
+            <!-- KARTU KIRI: Foto & Info -->
+            <div class="kartu" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:2rem">
+                <div style="position:relative;margin-bottom:1rem">
+                    <img src="${fotoSrc(u.foto, u.nama)}" id="profil-avatar"
+                         style="width:100px;height:100px;border-radius:50%;object-fit:cover;
+                                border:3px solid #e8f4fd;box-shadow:0 2px 12px rgba(0,0,0,.1)"
                          onerror="this.src='${urlAvatar(u.nama)}'">
-                    <label for="foto-input" style="position:absolute;bottom:12px;right:-4px;
-                        background:#0d6efd;color:#fff;border-radius:50%;width:30px;height:30px;
-                        display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.75rem"
-                        title="Ganti foto">
+                    <label for="foto-input"
+                           style="position:absolute;bottom:2px;right:2px;width:28px;height:28px;
+                                  background:#0d6efd;color:#fff;border-radius:50%;display:flex;
+                                  align-items:center;justify-content:center;cursor:pointer;
+                                  font-size:.7rem;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)"
+                           title="Ganti foto profil">
                         <i class="fas fa-camera"></i>
                     </label>
-                    <input type="file" id="foto-input" class="d-none" accept="image/*"
+                    <input type="file" id="foto-input" class="d-none" accept="image/jpeg,image/png,image/webp"
                            onchange="uploadFoto(this)">
                 </div>
+                <div id="foto-loading" class="d-none" style="font-size:.8rem;color:#0d6efd;margin-bottom:.5rem">
+                    <i class="fas fa-spinner fa-spin me-1"></i>Mengupload foto...
+                </div>
                 <h5 class="fw-bold mb-1" id="profil-nama-tampil">${u.nama}</h5>
-                <span style="background:#e8f4fd;color:#3498db;padding:3px 14px;
-                             border-radius:999px;font-size:.78rem;font-weight:600">
+                <span style="background:${warnaBadge}1A;color:${warnaBadge};padding:3px 14px;
+                             border-radius:999px;font-size:.75rem;font-weight:600;margin-bottom:1rem">
                     ${roleLabel}
                 </span>
-            </div>
-            <hr>
-            <div class="mb-3">
-                <label class="form-label fw-semibold small">Nama Tampilan</label>
-                <input type="text" class="form-control" id="input-nama-baru"
-                       value="${u.nama}" placeholder="Masukkan nama baru">
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold small">${labelID}</label>
-                <input type="text" class="form-control" id="input-id-baru"
-                       value="${nilaiID}" placeholder="Masukkan ${labelID} baru">
-                <div class="form-text">
-                    <i class="fas fa-exclamation-triangle text-warning me-1"></i>
-                    Ubah ${labelID} hanya jika ada kesalahan input sebelumnya.
+                <div style="width:100%;background:#f8f9fa;border-radius:10px;padding:1rem;text-align:left">
+                    <div style="font-size:.72rem;color:#6c757d;font-weight:600;margin-bottom:.5rem">INFO AKUN</div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:.35rem;font-size:.85rem">
+                        <span style="color:#6c757d">${labelID}</span>
+                        <span class="fw-semibold">${nilaiID || '—'}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:.85rem">
+                        <span style="color:#6c757d">${labelExtra}</span>
+                        <span class="fw-semibold">${nilaiExtra || '—'}</span>
+                    </div>
                 </div>
+                <button onclick="el('foto-input').click()"
+                        style="margin-top:1rem;width:100%;padding:.6rem;background:#f0f4ff;
+                               color:#0d6efd;border:1px solid #c7d9ff;border-radius:8px;
+                               font-size:.85rem;font-weight:600;cursor:pointer">
+                    <i class="fas fa-camera me-2"></i>Ganti Foto Profil
+                </button>
             </div>
-            <div class="mb-4">
-                <label class="form-label fw-semibold small">${labelExtra}</label>
-                <input type="text" class="form-control" value="${nilaiExtra}"
-                       disabled style="background:#f8f9fa;color:#6c757d">
+
+            <!-- KARTU KANAN: Form Edit -->
+            <div style="display:flex;flex-direction:column;gap:1rem">
+
+                <!-- Section: Informasi Dasar -->
+                <div class="kartu">
+                    <div style="font-size:.72rem;font-weight:700;color:#0d6efd;
+                                letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem">
+                        <i class="fas fa-user me-2"></i>Informasi Dasar
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Nama Lengkap</label>
+                        <input type="text" class="form-control" id="input-nama-baru"
+                               value="${u.nama}" placeholder="Masukkan nama lengkap">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">${labelID}</label>
+                        <input type="text" class="form-control" id="input-id-baru"
+                               value="${nilaiID}" placeholder="Masukkan ${labelID}">
+                        <div class="form-text" style="color:#e67e22">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Ubah ${labelID} hanya jika ada kesalahan data.
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">${labelExtra}</label>
+                        <input type="text" class="form-control" value="${nilaiExtra}"
+                               disabled style="background:#f8f9fa;color:#6c757d">
+                    </div>
+                    <button class="btn-simpan" onclick="simpanProfil()" style="width:100%">
+                        <i class="fas fa-save me-2"></i>Simpan Perubahan
+                    </button>
+                </div>
+
+                <!-- Section: Keamanan -->
+                <div class="kartu">
+                    <div style="font-size:.72rem;font-weight:700;color:#e74c3c;
+                                letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem">
+                        <i class="fas fa-lock me-2"></i>Keamanan Akun
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Kata Sandi Lama</label>
+                        <div style="position:relative">
+                            <input type="password" class="form-control" id="sandi-lama"
+                                   placeholder="Masukkan kata sandi lama"
+                                   style="padding-right:2.5rem">
+                            <button onclick="toggleSandiField('sandi-lama','eye-lama')"
+                                    type="button"
+                                    style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);
+                                           background:none;border:none;color:#6c757d;cursor:pointer;padding:0">
+                                <i class="fas fa-eye" id="eye-lama"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small">Kata Sandi Baru</label>
+                        <div style="position:relative">
+                            <input type="password" class="form-control" id="sandi-baru"
+                                   placeholder="Minimal 6 karakter"
+                                   style="padding-right:2.5rem">
+                            <button onclick="toggleSandiField('sandi-baru','eye-baru')"
+                                    type="button"
+                                    style="position:absolute;right:.75rem;top:50%;transform:translateY(-50%);
+                                           background:none;border:none;color:#6c757d;cursor:pointer;padding:0">
+                                <i class="fas fa-eye" id="eye-baru"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="gantiSandi()"
+                            style="width:100%;padding:.75rem;background:#fff0f0;color:#e74c3c;
+                                   border:1px solid #ffc0c0;border-radius:10px;font-weight:600;
+                                   cursor:pointer;font-size:.9rem">
+                        <i class="fas fa-key me-2"></i>Perbarui Kata Sandi
+                    </button>
+                </div>
+
             </div>
-            <button class="btn-simpan mb-3" onclick="simpanProfil()">
-                <i class="fas fa-save me-2"></i>Simpan Perubahan
-            </button>
-            <hr>
-            <h6 class="fw-bold mb-3">Ganti Kata Sandi</h6>
-            <div class="mb-3">
-                <label class="form-label fw-semibold small">Kata Sandi Lama</label>
-                <input type="password" class="form-control" id="sandi-lama" placeholder="••••••••">
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-semibold small">Kata Sandi Baru</label>
-                <input type="password" class="form-control" id="sandi-baru" placeholder="Minimal 6 karakter">
-            </div>
-            <button class="btn-aksi primer w-100" onclick="gantiSandi()">
-                <i class="fas fa-key me-2"></i>Perbarui Kata Sandi
-            </button>
         </div>`;
+}
+
+function toggleSandiField(inputId, iconId) {
+    const inp  = el(inputId);
+    const icon = el(iconId);
+    if (!inp || !icon) return;
+    const show = inp.type === 'password';
+    inp.type   = show ? 'text' : 'password';
+    icon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
 }
 
 async function simpanProfil() {
@@ -1461,27 +1529,20 @@ async function simpanProfil() {
     const idBaru = el('input-id-baru')?.value?.trim();
     if (!nama) { tampilToast('Nama tidak boleh kosong.', 'galat'); return; }
 
-    // Update nama
     const res = await apiJSON('api/profil?aksi=update_nama', { nama });
     if (!res.ok) { tampilToast(res.pesan, 'galat'); return; }
     STATE.user.nama = nama;
 
-    // Update NIP/NISN jika ada perubahan
     const u = STATE.user;
     const idLama = u.peran === 'siswa' ? (u.nisn||'') : (u.nip||'');
     if (idBaru && idBaru !== idLama) {
-        const res2 = await apiJSON('api/profil?aksi=update_id', {
-            id_baru: idBaru,
-            peran: u.peran
-        });
-        if (!res2.ok) {
-            tampilToast(res2.pesan, 'galat'); return;
-        }
+        const res2 = await apiJSON('api/profil?aksi=update_id', { id_baru: idBaru, peran: u.peran });
+        if (!res2.ok) { tampilToast(res2.pesan, 'galat'); return; }
         if (u.peran === 'siswa') STATE.user.nisn = idBaru;
         else STATE.user.nip = idBaru;
-        tampilToast('Nama dan ID berhasil diperbarui!', 'sukses');
+        tampilToast('Profil berhasil diperbarui!', 'sukses');
     } else {
-        tampilToast('Nama berhasil diperbarui!', 'sukses');
+        tampilToast('Profil berhasil diperbarui!', 'sukses');
     }
 
     perbaruiHeader();
@@ -1492,14 +1553,30 @@ async function simpanProfil() {
 async function uploadFoto(input) {
     const file = input.files[0];
     if (!file) return;
+
+    const loading = el('foto-loading');
+    const avatar  = el('profil-avatar');
+    if (loading) loading.classList.remove('d-none');
+
+    // Preview langsung sebelum upload
+    const reader = new FileReader();
+    reader.onload = e => { if (avatar) avatar.src = e.target.result; };
+    reader.readAsDataURL(file);
+
     const fd = new FormData();
     fd.append('foto', file);
     const res = await apiForm('api/profil?aksi=upload_foto', fd);
-    if (!res.ok) { tampilToast(res.pesan, 'galat'); return; }
+
+    if (loading) loading.classList.add('d-none');
+
+    if (!res.ok) {
+        tampilToast(res.pesan || 'Gagal upload foto.', 'galat');
+        if (avatar) avatar.src = fotoSrc(STATE.user.foto, STATE.user.nama);
+        return;
+    }
     STATE.user.foto = res.foto;
+    if (avatar) avatar.src = res.foto;
     perbaruiHeader();
-    const av = el('profil-avatar');
-    if (av) av.src = res.foto;
     tampilToast('Foto profil berhasil diperbarui!', 'sukses');
 }
 
@@ -1507,6 +1584,7 @@ async function gantiSandi() {
     const sandi_lama = el('sandi-lama')?.value;
     const sandi_baru = el('sandi-baru')?.value;
     if (!sandi_lama || !sandi_baru) { tampilToast('Isi semua field kata sandi.', 'galat'); return; }
+    if (sandi_baru.length < 6) { tampilToast('Kata sandi baru minimal 6 karakter.', 'galat'); return; }
     const res = await apiJSON('api/profil?aksi=ganti_sandi', { sandi_lama, sandi_baru });
     if (!res.ok) { tampilToast(res.pesan, 'galat'); return; }
     tampilToast('Kata sandi berhasil diperbarui!', 'sukses');
