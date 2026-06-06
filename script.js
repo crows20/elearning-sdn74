@@ -259,6 +259,8 @@ function perbaruiHeader() {
     const u = STATE.user;
     const roleLabel = u.peran === 'siswa'
         ? `Siswa · Kelas ${u.kelas}`
+        : u.peran === 'kepsek'
+        ? `Kepala Sekolah · ${u.mapel}`
         : `Guru · ${u.mapel}`;
     const src = fotoSrc(u.foto, u.nama);
     el('header-name').textContent   = u.nama;
@@ -504,42 +506,54 @@ async function hapusMateri(id) {
    RENDER — KUIS KAHOOT!
    ============================================================ */
 function renderKuis() {
-    const isGuru = STATE.user.peran === 'guru';
+    const peran = STATE.user.peran;
+    const isGuru = peran === 'guru' || peran === 'kepsek';
     el('dynamic-content').innerHTML = `
         <div class="section-header">
             <h3><i class="fas fa-gamepad me-2 text-primary"></i>
                 ${isGuru ? 'Kelola Kuis' : 'Kuis Interaktif'}
             </h3>
         </div>
-        <div class="kartu text-center py-5">
-            <img src="https://logos-world.net/wp-content/uploads/2021/08/Kahoot-Logo.png"
-                 alt="Logo Kahoot" style="width:160px;margin-bottom:1.5rem"
-                 onerror="this.style.display='none'">
-            <h4 class="fw-bold mb-2">Latihan Kuis Interaktif</h4>
-            <p class="text-muted mb-4 mx-auto" style="max-width:400px">
-                Gunakan platform Kahoot untuk mengerjakan latihan soal
-                secara seru dan menyenangkan. Masukkan PIN di bawah ini saat bergabung.
-            </p>
-            <div class="mb-4">
-                <div class="mb-2" style="font-size:.75rem;font-weight:700;color:#6c757d;letter-spacing:.08em">
-                    GAME PIN AKTIF
+        <div class="kartu" style="max-width:600px">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:1.5rem">
+                <div style="width:56px;height:56px;background:#7B2FBE;border-radius:14px;
+                     display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="fas fa-gamepad" style="color:#fff;font-size:1.5rem"></i>
                 </div>
-                <div class="pin-display">740074</div>
+                <div>
+                    <h5 class="fw-bold mb-1">Latihan Kuis Interaktif</h5>
+                    <p class="text-muted mb-0" style="font-size:.9rem">
+                        Platform Kahoot untuk latihan soal yang seru dan menyenangkan
+                    </p>
+                </div>
             </div>
-            <div class="d-flex gap-3 justify-content-center flex-wrap">
-                <a href="https://kahoot.it" target="_blank" rel="noopener noreferrer" class="btn-kahoot">
-                    <i class="fas fa-external-link-alt"></i>BUKA KAHOOT
+            <div style="background:#f8f9fa;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem">
+                <div style="font-size:.72rem;font-weight:700;color:#6c757d;
+                     letter-spacing:.1em;margin-bottom:.5rem">GAME PIN AKTIF</div>
+                <div class="pin-display" style="font-size:2.5rem;font-weight:800;
+                     color:#7B2FBE;letter-spacing:.15em">740074</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.75rem">
+                <a href="https://kahoot.it" target="_blank" rel="noopener noreferrer"
+                   style="display:flex;align-items:center;justify-content:center;gap:10px;
+                          padding:1rem;background:#7B2FBE;color:#fff;border-radius:12px;
+                          text-decoration:none;font-weight:700;font-size:1rem">
+                    <i class="fas fa-play-circle"></i>BUKA KAHOOT
                 </a>
                 ${isGuru ? `
                 <a href="https://kahoot.com" target="_blank" rel="noopener noreferrer"
-                   class="btn-aksi abu" style="padding:.9rem 1.8rem;border-radius:12px;font-size:1rem">
-                    <i class="fas fa-cog me-1"></i>Kelola di Kahoot.com
+                   style="display:flex;align-items:center;justify-content:center;gap:10px;
+                          padding:.85rem;background:#f0e6ff;color:#7B2FBE;border-radius:12px;
+                          text-decoration:none;font-weight:600;font-size:.95rem">
+                    <i class="fas fa-cog"></i>Kelola Kuis di Kahoot.com
                 </a>` : ''}
             </div>
-            <p class="text-muted small mt-4 mb-0">
-                <i class="fas fa-exclamation-circle me-1" style="color:#f39c12"></i>
-                Gunakan nama asli saat bergabung agar guru dapat merekap nilai.
-            </p>
+            <div style="margin-top:1.25rem;padding:.75rem;background:#fff8e1;
+                 border-radius:8px;font-size:.85rem;color:#856404;display:flex;
+                 align-items:flex-start;gap:8px">
+                <i class="fas fa-info-circle" style="margin-top:2px;flex-shrink:0"></i>
+                <span>Gunakan nama asli saat bergabung agar guru dapat merekap nilai dengan benar.</span>
+            </div>
         </div>`;
 }
 
@@ -644,56 +658,54 @@ function renderUpload() {
         <div class="section-header">
             <h3><i class="fas fa-upload me-2 text-primary"></i>Unggah Materi</h3>
         </div>
-        <div class="kartu">
-            <div class="upload-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+        <div class="kartu" style="max-width:700px">
+            <h6 class="fw-bold mb-4" style="color:#0d6efd;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase">
+                <i class="fas fa-info-circle me-2"></i>Informasi Materi
+            </h6>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
                 <div>
-                    <h6 class="fw-bold mb-3">Informasi Materi</h6>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small">Judul Materi *</label>
-                        <input type="text" id="inp-judul" class="form-control"
-                               placeholder="Contoh: Matematika — Pecahan">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small">Mata Pelajaran *</label>
-                        <select id="inp-mapel" class="form-select">
-                            <option value="">Pilih mata pelajaran...</option>
-                            ${DAFTAR_MAPEL.map(m => `<option>${m}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small">Kelas</label>
-                        <select id="inp-kelas" class="form-select">
-                            <option>V A</option><option>V B</option>
-                        </select>
-                    </div>
+                    <label class="form-label fw-semibold small">Judul Materi *</label>
+                    <input type="text" id="inp-judul" class="form-control"
+                           placeholder="Contoh: Matematika — Pecahan">
                 </div>
                 <div>
-                    <h6 class="fw-bold mb-3">Pilih File</h6>
-                    <div class="upload-zone" id="upload-zone"
-                         onclick="el('fileInput').click()"
-                         ondragover="dragMasuk(event)"
-                         ondragleave="dragKeluar()"
-                         ondrop="dropFile(event)">
-                        <div class="upload-zone-ikon">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
-                        <div class="upload-zone-judul">Klik atau seret file ke sini</div>
-                        <div class="upload-zone-sub">PDF, PPT, Word, Video · Maks. 50 MB</div>
-                        <div class="upload-nama-file" id="nama-file"></div>
-                    </div>
-                    <input type="file" id="fileInput" class="d-none"
-                           accept=".pdf,.ppt,.pptx,.mp4,.avi,.mkv,.doc,.docx"
-                           onchange="pilihFile(this)">
-                    <button class="btn-simpan mt-3" onclick="prosesUpload()">
-                        <i class="fas fa-save me-2"></i>Simpan & Unggah Materi
-                    </button>
-                    <div class="progress-wrap" id="progress-wrap" style="display:none">
-                        <div class="progress-bg">
-                            <div class="progress-bar-fill" id="progress-bar"></div>
-                        </div>
-                        <div class="progress-status" id="progress-status">Mengunggah...</div>
-                    </div>
+                    <label class="form-label fw-semibold small">Mata Pelajaran *</label>
+                    <select id="inp-mapel" class="form-select">
+                        <option value="">Pilih mata pelajaran...</option>
+                        ${DAFTAR_MAPEL.map(m => `<option>${m}</option>`).join('')}
+                    </select>
                 </div>
+            </div>
+            <div style="margin-bottom:1.25rem">
+                <label class="form-label fw-semibold small">Kelas</label>
+                <select id="inp-kelas" class="form-select" style="max-width:200px">
+                    <option>V A</option><option>V B</option>
+                </select>
+            </div>
+            <div class="upload-zone" id="upload-zone"
+                 onclick="el('fileInput').click()"
+                 ondragover="dragMasuk(event)"
+                 ondragleave="dragKeluar()"
+                 ondrop="dropFile(event)"
+                 style="margin-bottom:1rem">
+                <div class="upload-zone-ikon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="upload-zone-judul">Klik atau seret file ke sini</div>
+                <div class="upload-zone-sub">PDF, PPT, Word, Video · Maks. 50 MB</div>
+                <div class="upload-nama-file" id="nama-file"></div>
+            </div>
+            <input type="file" id="fileInput" class="d-none"
+                   accept=".pdf,.ppt,.pptx,.mp4,.avi,.mkv,.doc,.docx"
+                   onchange="pilihFile(this)">
+            <button class="btn-simpan" onclick="prosesUpload()" style="width:100%">
+                <i class="fas fa-cloud-upload-alt me-2"></i>Simpan & Unggah Materi
+            </button>
+            <div class="progress-wrap" id="progress-wrap" style="display:none;margin-top:.75rem">
+                <div class="progress-bg">
+                    <div class="progress-bar-fill" id="progress-bar"></div>
+                </div>
+                <div class="progress-status" id="progress-status">Mengunggah...</div>
             </div>
         </div>
         <div class="kartu">
@@ -849,7 +861,14 @@ async function renderRekap() {
     const res = await api('api/nilai?aksi=rekap');
     if (!res.ok) { tampilToast(res.pesan, 'galat'); return; }
 
-    const rekap  = res.rekap;
+    // Filter: wali kelas hanya tampilkan siswa kelasnya sendiri
+    const u = STATE.user;
+    let rekap = res.rekap;
+    if (u.peran === 'guru' && u.mapel) {
+        // Ambil kelas dari mapel guru, contoh "Wali Kelas V A" -> "V A"
+        const kelasGuru = u.mapel.replace('Wali Kelas', '').trim();
+        if (kelasGuru) rekap = rekap.filter(r => r.kelas === kelasGuru);
+    }
     const lulus  = rekap.filter(r => parseFloat(r.rata || 0) >= 75).length;
     const remidi = rekap.length - lulus;
     const rataK  = rekap.length
@@ -890,7 +909,7 @@ async function renderRekap() {
                 <button class="btn-aksi primer" onclick="bukaModalNilai(null)">
                     <i class="fas fa-plus"></i>Input Nilai
                 </button>
-                <a class="btn-aksi abu" href="php/nilai.php?aksi=export_csv" download>
+                <a class="btn-aksi abu" href="api/nilai?aksi=export_csv" download>
                     <i class="fas fa-download"></i>Export CSV
                 </a>
             </div>
@@ -935,19 +954,26 @@ async function renderRekap() {
    ============================================================ */
 function _templateModalNilai(rekap) {
     const opsiSiswa = rekap.map(r =>
-        `<option value="${r.id}">${r.nama} (${r.kelas}) — NISN: ${r.nisn}</option>`).join('');
+        `<option value="${r.id}">${r.nama} — Kelas ${r.kelas}</option>`).join('');
     const opsiMapel = DAFTAR_MAPEL.map(m => `<option value="${m}">${m}</option>`).join('');
     return `
     <div id="modal-overlay" class="modal-overlay d-none" onclick="_klikLuarModal(event)">
-        <div class="modal-box" role="dialog" aria-modal="true">
-            <div class="modal-header-custom">
-                <h5 class="modal-title-custom">
-                    <i class="fas fa-pen-to-square me-2"></i>
+        <div class="modal-box" role="dialog" aria-modal="true" style="max-width:480px;width:95%">
+            <div class="modal-header-custom" style="padding:1rem 1.25rem;border-bottom:1px solid #e9ecef">
+                <h5 class="modal-title-custom" style="font-size:1rem;margin:0;display:flex;align-items:center;gap:8px">
+                    <span style="width:32px;height:32px;background:#e8f4fd;border-radius:8px;
+                          display:flex;align-items:center;justify-content:center">
+                        <i class="fas fa-pen-to-square" style="color:#0d6efd;font-size:.85rem"></i>
+                    </span>
                     <span id="modal-judul-teks">Input Nilai Siswa</span>
                 </h5>
-                <button class="modal-close-btn" onclick="tutupModalNilai()" aria-label="Tutup"><i class="fas fa-times"></i></button>
+                <button class="modal-close-btn" onclick="tutupModalNilai()" aria-label="Tutup"
+                        style="width:32px;height:32px;border-radius:8px;border:1px solid #dee2e6;
+                               background:#fff;display:flex;align-items:center;justify-content:center">
+                    <i class="fas fa-times" style="font-size:.85rem;color:#6c757d"></i>
+                </button>
             </div>
-            <div class="modal-body-custom">
+            <div class="modal-body-custom" style="padding:1.25rem">
                 <div class="mb-3" id="wrap-pilih-siswa">
                     <label class="form-label fw-semibold small">SISWA *</label>
                     <select id="modal-siswa" class="form-select">
@@ -956,7 +982,8 @@ function _templateModalNilai(rekap) {
                 </div>
                 <div class="mb-3 d-none" id="wrap-nama-siswa">
                     <label class="form-label fw-semibold small">SISWA</label>
-                    <input type="text" id="modal-nama-siswa" class="form-control" readonly style="background:#f8f9fa">
+                    <input type="text" id="modal-nama-siswa" class="form-control" readonly
+                           style="background:#f8f9fa;font-weight:600">
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold small">MATA PELAJARAN *</label>
@@ -964,29 +991,44 @@ function _templateModalNilai(rekap) {
                         <option value="">— Pilih Mata Pelajaran —</option>${opsiMapel}
                     </select>
                 </div>
-                <div class="nilai-input-grid">
-                    <div>
-                        <label class="form-label fw-semibold small">NILAI TUGAS *</label>
-                        <input type="number" id="modal-tugas" class="form-control" placeholder="0–100" min="0" max="100" oninput="if(this.value>100)this.value=100;if(this.value<0)this.value=0;_hitungNilaiAkhir()">
+                <div style="background:#f8f9fa;border-radius:10px;padding:1rem;margin-bottom:.75rem">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+                        <div>
+                            <label class="form-label fw-semibold small">TUGAS *</label>
+                            <input type="number" id="modal-tugas" class="form-control text-center fw-bold"
+                                   placeholder="0–100" min="0" max="100"
+                                   oninput="if(this.value>100)this.value=100;if(this.value<0)this.value=0;_hitungNilaiAkhir()"
+                                   style="font-size:1.1rem">
+                            <div style="font-size:.7rem;color:#6c757d;text-align:center;margin-top:3px">bobot 30%</div>
+                        </div>
+                        <div>
+                            <label class="form-label fw-semibold small">UTS *</label>
+                            <input type="number" id="modal-uts" class="form-control text-center fw-bold"
+                                   placeholder="0–100" min="0" max="100"
+                                   oninput="if(this.value>100)this.value=100;if(this.value<0)this.value=0;_hitungNilaiAkhir()"
+                                   style="font-size:1.1rem">
+                            <div style="font-size:.7rem;color:#6c757d;text-align:center;margin-top:3px">bobot 30%</div>
+                        </div>
+                        <div>
+                            <label class="form-label fw-semibold small">UAS *</label>
+                            <input type="number" id="modal-uas" class="form-control text-center fw-bold"
+                                   placeholder="0–100" min="0" max="100"
+                                   oninput="if(this.value>100)this.value=100;if(this.value<0)this.value=0;_hitungNilaiAkhir()"
+                                   style="font-size:1.1rem">
+                            <div style="font-size:.7rem;color:#6c757d;text-align:center;margin-top:3px">bobot 40%</div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label fw-semibold small">NILAI UTS *</label>
-                        <input type="number" id="modal-uts" class="form-control" placeholder="0–100" min="0" max="100" oninput="if(this.value>100)this.value=100;if(this.value<0)this.value=0;_hitungNilaiAkhir()">
-                    </div>
-                    <div>
-                        <label class="form-label fw-semibold small">NILAI UAS *</label>
-                        <input type="number" id="modal-uas" class="form-control" placeholder="0–100" min="0" max="100" oninput="if(this.value>100)this.value=100;if(this.value<0)this.value=0;_hitungNilaiAkhir()">
-                    </div>
-                    <div>
-                        <label class="form-label fw-semibold small">NILAI AKHIR</label>
-                        <div class="nilai-akhir-display" id="display-nilai-akhir">
-                            <span id="nilai-akhir-angka">—</span>
+                    <div style="background:#fff;border-radius:8px;padding:.75rem;
+                                display:flex;align-items:center;justify-content:space-between">
+                        <div style="font-size:.8rem;color:#6c757d;font-weight:600">NILAI AKHIR</div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span id="nilai-akhir-angka" style="font-size:1.5rem;font-weight:800;color:#0d6efd">—</span>
                             <span id="nilai-akhir-status" class="nilai-akhir-badge"></span>
                         </div>
                     </div>
                 </div>
-                <div class="form-text mt-1">
-                    <i class="fas fa-info-circle text-primary me-1"></i>
+                <div class="form-text">
+                    <i class="fas fa-calculator text-primary me-1"></i>
                     Nilai akhir = (Tugas×30% + UTS×30% + UAS×40%) · KKM: 75
                 </div>
             </div>
