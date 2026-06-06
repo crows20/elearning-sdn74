@@ -49,6 +49,25 @@ module.exports = async (req, res) => {
         return ok(res, { pesan: 'Foto berhasil diperbarui.', foto: url });
     }
 
+    // ── Update NIP/NISN ──────────────────────────────────
+    if (req.method === 'POST' && aksi === 'update_id') {
+        const { id_baru } = await parseBody(req);
+        if (!id_baru?.trim()) return err(res, 'ID tidak boleh kosong.');
+
+        if (sesi.peran === 'siswa') {
+            // Cek duplikat NISN
+            const { data: cek } = await supabase.from('siswa').select('id').eq('nisn', id_baru).single();
+            if (cek && cek.id !== sesi.id) return err(res, 'NISN sudah digunakan akun lain.');
+            await supabase.from('siswa').update({ nisn: id_baru }).eq('id', sesi.id);
+        } else {
+            // Cek duplikat NIP
+            const { data: cek } = await supabase.from('guru').select('id').eq('nip', id_baru).single();
+            if (cek && cek.id !== sesi.id) return err(res, 'NIP sudah digunakan akun lain.');
+            await supabase.from('guru').update({ nip: id_baru }).eq('id', sesi.id);
+        }
+        return ok(res, { pesan: 'ID berhasil diperbarui.' });
+    }
+
     // ── Ganti kata sandi ──────────────────────────────────
     if (req.method === 'POST' && aksi === 'ganti_sandi') {
         const { sandi_lama, sandi_baru } = await parseBody(req);
