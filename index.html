@@ -479,19 +479,20 @@
                                 onclick="toggleNotif()"
                                 aria-label="Notifikasi"
                                 title="Notifikasi">
-                            <i class="fas fa-bell"></i>
-                            <span class="notif-badge" id="notif-badge">2</span>
+                            <!-- SVG Bell agar pasti tampil -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                 fill="none" stroke="#0d6efd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                            </svg>
+                            <span class="notif-badge" id="notif-badge" style="display:none">0</span>
                         </button>
                         <!-- Panel notifikasi -->
                         <div class="notif-panel" id="notif-panel" aria-hidden="true">
                             <div class="notif-header">NOTIFIKASI</div>
-                            <div class="notif-item" onclick="pindahHalaman('kuis'); tutupNotif();">
-                                <div class="notif-title">📌 Kuis Matematika Aktif</div>
-                                <div class="notif-desc">Senin, 14 April 2026 · 08.00 WIB via Kahoot</div>
-                            </div>
-                            <div class="notif-item" onclick="pindahHalaman('materi'); tutupNotif();">
-                                <div class="notif-title">📚 Materi IPA Baru</div>
-                                <div class="notif-desc">Sistem Tata Surya telah diunggah</div>
+                            <div style="padding:1.5rem;text-align:center;color:#6c757d;font-size:.85rem">
+                                <i class="fas fa-spinner fa-spin d-block mb-2" style="font-size:1.5rem"></i>
+                                Memuat notifikasi...
                             </div>
                         </div>
                     </div>
