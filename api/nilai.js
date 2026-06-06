@@ -16,7 +16,20 @@ module.exports = async (req, res) => {
     // ── Rekap semua siswa (guru + kepsek) ────────────────
     if (req.method === 'GET' && aksi === 'rekap') {
         if (!['guru','kepsek'].includes(sesi.peran)) return err(res, 'Akses ditolak.', 403);
-        const { data: siswaList } = await supabase.from('siswa').select('id, nisn, nama, kelas').order('kelas').order('nama');
+
+        // Ambil info guru untuk filter kelas
+        let kelasFilter = null;
+        if (sesi.peran === 'guru') {
+            const { data: guruData } = await supabase.from('guru').select('mapel').eq('id', sesi.id).single();
+            if (guruData?.mapel) {
+                kelasFilter = guruData.mapel.replace('Wali Kelas', '').trim() || null;
+            }
+        }
+
+        let query = supabase.from('siswa').select('id, nisn, nama, kelas').order('kelas').order('nama');
+        if (kelasFilter) query = query.eq('kelas', kelasFilter);
+
+        const { data: siswaList } = await query;
         const { data: nilaiAll }  = await supabase.from('nilai').select('id_siswa, akhir');
 
         const rekap = (siswaList || []).map(s => {
@@ -84,7 +97,7 @@ module.exports = async (req, res) => {
 
     // ── Tambah nilai ─────────────────────────────────────
     if (req.method === 'POST' && aksi === 'tambah') {
-        if (!['guru','kepsek'].includes(sesi.peran)) return err(res, 'Akses ditolak.', 403);
+        if (!['guru','kepsek'].includes(sesi.peran)) return err(res, 'Akses ditolak. Hanya guru dan kepala sekolah.', 403);
         const { id_siswa, mapel, tugas, uts, uas } = await parseBody(req);
         if (!id_siswa || !mapel) return err(res, 'Data tidak lengkap.');
         const t = Math.min(100, Math.max(0, parseFloat(tugas)));
