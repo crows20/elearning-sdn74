@@ -247,11 +247,13 @@ async function muatNotifikasi() {
     const { notifikasi, jumlah } = res;
 
     // Update badge
+    _notifSudahDibaca = false;
     const badge = el('notif-badge');
     if (badge) {
         if (jumlah > 0) {
             badge.textContent = jumlah > 9 ? '9+' : jumlah;
             badge.style.display = 'flex';
+            badge.style.background = '#dc3545'; // merah kembali saat ada notif baru
         } else {
             badge.style.display = 'none';
         }
@@ -389,8 +391,24 @@ function pindahHalaman(h) {
     }, NAV_LOADING_DELAY);
 }
 
-function toggleNotif()       { el('notif-panel').classList.toggle('tampil'); tutupProfilMenu(); }
-function tutupNotif()        { el('notif-panel').classList.remove('tampil'); }
+let _notifSudahDibaca = false;
+
+function toggleNotif() {
+    const panel = el('notif-panel');
+    const isOpen = panel.classList.toggle('tampil');
+    tutupProfilMenu();
+
+    if (isOpen && !_notifSudahDibaca) {
+        // Tandai sudah dibaca - badge tetap ada tapi warna berubah jadi abu
+        const badge = el('notif-badge');
+        if (badge && badge.style.display !== 'none') {
+            badge.style.background = '#6c757d';
+        }
+        _notifSudahDibaca = true;
+    }
+}
+
+function tutupNotif() { el('notif-panel').classList.remove('tampil'); }
 function toggleProfilMenu()  { el('profil-dropdown').classList.toggle('tampil'); tutupNotif(); }
 function tutupProfilMenu()   { el('profil-dropdown').classList.remove('tampil'); }
 
