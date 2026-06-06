@@ -237,6 +237,56 @@ function masukDashboard() {
     el('dashboard-screen').classList.remove('d-none');
     STATE.halaman = '';
     pindahHalaman('dashboard');
+    muatNotifikasi(); // Load real notifications
+}
+
+async function muatNotifikasi() {
+    const res = await api('api/notifikasi');
+    if (!res.ok) return;
+
+    const { notifikasi, jumlah } = res;
+
+    // Update badge
+    const badge = el('notif-badge');
+    if (badge) {
+        if (jumlah > 0) {
+            badge.textContent = jumlah > 9 ? '9+' : jumlah;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    // Update panel
+    const panel = el('notif-panel');
+    if (!panel) return;
+
+    if (notifikasi.length === 0) {
+        panel.innerHTML = `
+            <div class="notif-header">NOTIFIKASI</div>
+            <div style="padding:1.5rem;text-align:center;color:#6c757d;font-size:.85rem">
+                <i class="fas fa-check-circle d-block mb-2" style="font-size:1.5rem;color:#2ecc71"></i>
+                Tidak ada notifikasi baru
+            </div>`;
+        return;
+    }
+
+    const items = notifikasi.map(n => `
+        <div class="notif-item" onclick="pindahHalaman('${n.halaman}'); tutupNotif();"
+             style="cursor:pointer">
+            <div class="notif-title">${n.judul}</div>
+            <div class="notif-desc">${n.deskripsi}</div>
+        </div>`).join('');
+
+    panel.innerHTML = `
+        <div class="notif-header">NOTIFIKASI <span style="color:#0d6efd;font-weight:700">(${jumlah})</span></div>
+        ${items}
+        <div style="padding:8px 12px;border-top:1px solid #f0f0f0;text-align:center">
+            <button onclick="muatNotifikasi();tutupNotif();"
+                    style="background:none;border:none;color:#0d6efd;font-size:.8rem;cursor:pointer">
+                <i class="fas fa-sync-alt me-1"></i>Perbarui
+            </button>
+        </div>`;
 }
 
 async function doLogout() {
