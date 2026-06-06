@@ -701,9 +701,13 @@ body {
     z-index: 100;
     background: var(--bg-card);
     height: var(--navbar-h);
+    min-height: var(--navbar-h);
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-bottom: 1px solid var(--color-border, #e9ecef);
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    padding: 0 1.25rem;
     padding: 0 1.5rem;
     box-shadow: var(--shadow-sm);
     border-bottom: 1px solid var(--border-color);
@@ -713,6 +717,8 @@ body {
 /* Skripsi BAB IV: "fitur toggle sidebar yang memungkinkan pengguna
    menyembunyikan atau menampilkan panel navigasi" */
 .btn-toggle-sidebar {
+    display: flex !important;
+    visibility: visible !important;
     width: 40px;
     height: 40px;
     background: var(--primary-ultra);
