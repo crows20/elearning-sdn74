@@ -399,10 +399,12 @@ function toggleNotif() {
     tutupProfilMenu();
 
     if (isOpen && !_notifSudahDibaca) {
-        // Tandai sudah dibaca - badge tetap ada tapi warna berubah jadi abu
+        // Badge tetap tampil dengan angka, hanya warna berubah jadi abu
         const badge = el('notif-badge');
         if (badge && badge.style.display !== 'none') {
             badge.style.background = '#6c757d';
+            badge.style.opacity = '0.8';
+            // Angka TIDAK dihapus - tetap tampil
         }
         _notifSudahDibaca = true;
     }
@@ -1376,6 +1378,20 @@ function _refreshTabelRekap(rekap) {
    ============================================================ */
 async function renderProfil() {
     const u = STATE.user;
+
+    // Label yang benar per peran
+    const labelID    = u.peran === 'siswa' ? 'NISN' : 'NIP';
+    const nilaiID    = u.peran === 'siswa' ? (u.nisn||'') : (u.nip||'');
+    const labelExtra = u.peran === 'siswa' ? 'Kelas'
+                     : u.peran === 'kepsek' ? 'Jabatan'
+                     : 'Wali Kelas';
+    const nilaiExtra = u.peran === 'siswa' ? (u.kelas||'')
+                     : u.peran === 'kepsek' ? 'Kepala Sekolah'
+                     : (u.mapel||'');
+    const roleLabel  = u.peran === 'siswa'  ? `Siswa · Kelas ${u.kelas}`
+                     : u.peran === 'kepsek' ? `Kepala Sekolah`
+                     : `Guru · ${u.mapel}`;
+
     el('dynamic-content').innerHTML = `
         <div class="section-header">
             <h3><i class="fas fa-user-edit me-2 text-primary"></i>Edit Profil</h3>
@@ -1398,7 +1414,7 @@ async function renderProfil() {
                 <h5 class="fw-bold mb-1" id="profil-nama-tampil">${u.nama}</h5>
                 <span style="background:#e8f4fd;color:#3498db;padding:3px 14px;
                              border-radius:999px;font-size:.78rem;font-weight:600">
-                    ${u.peran === 'siswa' ? 'Siswa · Kelas ' + u.kelas : 'Guru · ' + u.mapel}
+                    ${roleLabel}
                 </span>
             </div>
             <hr>
@@ -1408,16 +1424,21 @@ async function renderProfil() {
                        value="${u.nama}" placeholder="Masukkan nama baru">
             </div>
             <div class="mb-3">
-                <label class="form-label fw-semibold small">${u.peran === 'siswa' ? 'NISN' : 'NIP'}</label>
-                <input type="text" class="form-control" value="${u.peran === 'siswa' ? u.nisn||'' : u.nip||''}" disabled style="background:#f8f9fa">
+                <label class="form-label fw-semibold small">${labelID}</label>
+                <input type="text" class="form-control" id="input-id-baru"
+                       value="${nilaiID}" placeholder="Masukkan ${labelID} baru">
+                <div class="form-text">
+                    <i class="fas fa-exclamation-triangle text-warning me-1"></i>
+                    Ubah ${labelID} hanya jika ada kesalahan input sebelumnya.
+                </div>
             </div>
             <div class="mb-4">
-                <label class="form-label fw-semibold small">${u.peran === 'siswa' ? 'Kelas' : 'Mata Pelajaran'}</label>
-                <input type="text" class="form-control"
-                       value="${u.peran === 'siswa' ? u.kelas : u.mapel}" disabled style="background:#f8f9fa">
+                <label class="form-label fw-semibold small">${labelExtra}</label>
+                <input type="text" class="form-control" value="${nilaiExtra}"
+                       disabled style="background:#f8f9fa;color:#6c757d">
             </div>
             <button class="btn-simpan mb-3" onclick="simpanProfil()">
-                <i class="fas fa-save me-2"></i>Simpan Nama
+                <i class="fas fa-save me-2"></i>Simpan Perubahan
             </button>
             <hr>
             <h6 class="fw-bold mb-3">Ganti Kata Sandi</h6>
@@ -1436,15 +1457,36 @@ async function renderProfil() {
 }
 
 async function simpanProfil() {
-    const nama = el('input-nama-baru')?.value?.trim();
+    const nama   = el('input-nama-baru')?.value?.trim();
+    const idBaru = el('input-id-baru')?.value?.trim();
     if (!nama) { tampilToast('Nama tidak boleh kosong.', 'galat'); return; }
+
+    // Update nama
     const res = await apiJSON('api/profil?aksi=update_nama', { nama });
     if (!res.ok) { tampilToast(res.pesan, 'galat'); return; }
     STATE.user.nama = nama;
+
+    // Update NIP/NISN jika ada perubahan
+    const u = STATE.user;
+    const idLama = u.peran === 'siswa' ? (u.nisn||'') : (u.nip||'');
+    if (idBaru && idBaru !== idLama) {
+        const res2 = await apiJSON('api/profil?aksi=update_id', {
+            id_baru: idBaru,
+            peran: u.peran
+        });
+        if (!res2.ok) {
+            tampilToast(res2.pesan, 'galat'); return;
+        }
+        if (u.peran === 'siswa') STATE.user.nisn = idBaru;
+        else STATE.user.nip = idBaru;
+        tampilToast('Nama dan ID berhasil diperbarui!', 'sukses');
+    } else {
+        tampilToast('Nama berhasil diperbarui!', 'sukses');
+    }
+
     perbaruiHeader();
     const pnt = el('profil-nama-tampil');
     if (pnt) pnt.textContent = nama;
-    tampilToast('Nama berhasil diperbarui!', 'sukses');
 }
 
 async function uploadFoto(input) {
