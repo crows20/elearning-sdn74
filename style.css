@@ -747,18 +747,21 @@ body {
     position: relative;
     width: 40px;
     height: 40px;
-    background: var(--primary-ultra);
-    border: 1px solid var(--primary-light);
-    border-radius: var(--radius-sm);
-    display: flex;
+    background: var(--primary-ultra, #f0f4ff);
+    border: 1px solid var(--primary-light, #e8f0fe);
+    border-radius: var(--radius-sm, 8px);
+    display: flex !important;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text-secondary);
-    font-size: 1rem;
-    transition: background var(--ease), color var(--ease);
+    color: #0d6efd !important;
+    font-size: 1.1rem;
+    transition: background 0.2s, color 0.2s;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
-.btn-notif:hover { background: var(--primary-light); color: var(--primary); }
+.btn-notif i { color: #0d6efd !important; font-size: 1.1rem; }
+.btn-notif:hover { background: #dbeafe; color: #0d6efd; }
 
 .notif-badge {
     position: absolute;
